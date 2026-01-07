@@ -10,6 +10,7 @@ import {
   OutlinedInput,
   Chip,
 } from "@mui/material";
+import dayjs from "dayjs";
 import { fetchEmployeeEmails, sendPayslips } from "../lib/api";
 
 export default function SendPayslips() {
@@ -17,13 +18,20 @@ export default function SendPayslips() {
   const [selectedEmails, setSelectedEmails] = useState<string[]>([]);
   const [file, setFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
+  const months = Array.from({ length: 12 }, (_, i) =>
+    dayjs().month(i).format("MMMM")
+  );
 
+  const currentYear = new Date().getFullYear();
+  const [payrollMonth, setPayrollMonth] = useState(
+    `${months[new Date().getMonth()]} ${currentYear}`
+  );
   useEffect(() => {
     fetchEmployeeEmails()
       .then(setEmails)
       .catch((err) => alert(err.message));
   }, []);
-// console.log(emails)
+  // console.log(emails)
   const fileToBase64 = (file: File): Promise<string> =>
     new Promise((resolve, reject) => {
       const reader = new FileReader();
@@ -54,11 +62,11 @@ export default function SendPayslips() {
       }));
 
       await sendPayslips({
-        subject: "January Payslip",
+        subject: `${payrollMonth} Payslip`,
         message: `
           <p>Dear Employee,</p>
-          <p>Please find attached your <strong>January payslip</strong>.</p>
-          <p>Have a nice day.<br/><strong>Payroll Team</strong></p>
+          <p>Please find attached your <strong>${payrollMonth} payslip</strong>.</p>
+          <p>Have a nice day.<br/><strong>VistaCloud Team</strong></p>
         `,
         payslips,
       });
@@ -85,7 +93,20 @@ export default function SendPayslips() {
       }}
     >
       <Typography variant="h6">Send Payslips</Typography>
-
+      <FormControl fullWidth>
+        <InputLabel>Payroll Month</InputLabel>
+        <Select
+          value={payrollMonth}
+          label="Payroll Month"
+          onChange={(e) => setPayrollMonth(e.target.value)}
+        >
+          {months.map((month) => (
+            <MenuItem key={month} value={`${month} ${currentYear}`}>
+              {month} {currentYear}
+            </MenuItem>
+          ))}
+        </Select>
+      </FormControl>
       <FormControl>
         <InputLabel>Select Employees</InputLabel>
         <Select
