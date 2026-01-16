@@ -1,0 +1,91 @@
+import { useEffect, useState } from "react";
+import {
+  Table,
+  TableHead,
+  TableRow,
+  TableCell,
+  TableBody,
+  Typography,
+  Box,
+  Button,
+} from "@mui/material";
+
+import { fetchEmployee } from "../lib/api";
+import CustomModal from "../components/CustomModal";
+import AddEmployee from "../components/AddEmployee";
+
+type Employee = {
+  name: string;
+  email: string;
+};
+
+export default function EmployeeList() {
+  const [employees, setEmployees] = useState<Employee[]>([]);
+  const [modalOpen, setModalOpen] = useState(false);
+
+  useEffect(() => {
+    fetchEmployee()
+      .then(setEmployees)
+      .catch((err) => alert(err.message));
+  }, []);
+  const handleAddEmployee = () => {
+    setModalOpen(true);
+  };
+  const handleSave = async () => {
+    setModalOpen(false);
+    const updatedEmployees = await fetchEmployee();
+    setEmployees(updatedEmployees);
+  };
+
+  return (
+    <Box sx={{ maxWidth: 900, mx: "auto", mt: 5 }}>
+      <Box
+        mb={3}
+        display="flex"
+        justifyContent="space-between"
+        alignItems="center"
+      >
+        <Typography variant="h6" gutterBottom>
+          Employee List
+        </Typography>
+        <Button variant="contained" onClick={handleAddEmployee}>
+          + Add Employee
+        </Button>
+      </Box>
+      <Table>
+        <TableHead>
+          <TableRow>
+            <TableCell>Employee</TableCell>
+            <TableCell>Email</TableCell>
+            <TableCell>Action</TableCell>
+          </TableRow>
+        </TableHead>
+
+        <TableBody>
+          {employees.map((employee) => (
+            <TableRow
+              key={employee.email}
+              sx={{
+                "&:hover": { backgroundColor: "#f5f5f5" },
+                alignItems: "center",
+              }}
+            >
+              <TableCell>{employee.name}</TableCell>
+              <TableCell>{employee.email}</TableCell>
+              <TableCell>
+                <Button
+                  onClick={() => alert(`Viewing details for ${employee.name}`)}
+                >
+                  View
+                </Button>
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+      <CustomModal open={modalOpen} onClose={() => setModalOpen(false)}>
+        <AddEmployee onSave={handleSave} />
+      </CustomModal>
+    </Box>
+  );
+}

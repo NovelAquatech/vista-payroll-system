@@ -1,7 +1,11 @@
-export async function fetchEmployeeEmails(): Promise<string[]> {
+export type Employee = {
+  name: string;
+  email: string;
+};
+export async function fetchEmployee(): Promise<Employee[]> {
   const res = await fetch(import.meta.env.VITE_GET_EMPLOYEES_URL);
   if (!res.ok) {
-    throw new Error("Failed to fetch employee emails");
+    throw new Error("Failed to fetch employee");
   }
   return res.json();
 }
