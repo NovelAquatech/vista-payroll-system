@@ -26,3 +26,14 @@ export async function sendPayslips(payload: any) {
   return res.json();
 }
 
+export async function fetchPayslipStatus(month: string) {
+  const url =
+    `${import.meta.env.VITE_API_BASE_URL}/payslipStatus` +
+    `?month=${encodeURIComponent(month)}` +
+    `&code=${import.meta.env.VITE_FUNCTION_KEY}`;
+
+  const res = await fetch(url);
+  if (!res.ok) throw new Error("Failed to fetch payslip status");
+  return res.json();
+}
+

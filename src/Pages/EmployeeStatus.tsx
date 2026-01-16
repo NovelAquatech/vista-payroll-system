@@ -5,6 +5,7 @@ import {
 } from "@mui/material";
 import CheckIcon from "@mui/icons-material/Check";
 import dayjs from "dayjs";
+import { fetchPayslipStatus } from "../lib/api";
 
 type StatusRow = {
   name: string;
@@ -19,11 +20,9 @@ export default function EmployeeStatus() {
   const [rows, setRows] = useState<StatusRow[]>([]);
   const month = "2026-01"; // dynamic later
 
-  useEffect(() => {
-    fetch(`${import.meta.env.VITE_API_BASE_URL}/payslipStatus?month=${month}`)
-      .then(res => res.json())
-      .then(setRows);
-  }, []);
+ useEffect(() => {
+  fetchPayslipStatus(month).then(setRows);
+}, [month]);
 
   return (
     <Box sx={{ maxWidth: 900, mx: "auto", mt: 5 }}>
