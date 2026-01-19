@@ -5,7 +5,7 @@ export default function Navbar() {
   const location = useLocation();
 
   const navItems = [
-    { label: "Dashboard", path: "/dashboard" },
+    { label: "Dashboard", path: "/" },
     { label: "Employees", path: "/employees" },    
     { label: "Send Payslips", path: "/send-payslips" },
   ];

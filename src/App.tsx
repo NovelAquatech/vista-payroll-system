@@ -10,7 +10,7 @@ function App() {
     <>
       <Navbar />
       <Routes>
-        <Route path="/dashboard" element={<EmployeeStatus />} />
+        <Route path="/" element={<EmployeeStatus />} />
         <Route path="/employees" element={<EmployeeList />} />      
         <Route path="/send-payslips" element={<SendPayslips />} />
       </Routes>

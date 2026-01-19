@@ -9,10 +9,14 @@ import {
   Box,
   Button,
 } from "@mui/material";
-
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
+import IconButton from "@mui/material/IconButton";
 import { fetchEmployee } from "../lib/api";
 import CustomModal from "../components/CustomModal";
 import AddEmployee from "../components/AddEmployee";
+import EditEmployee from "../components/EditEmployee";
+import DeleteEmployee from "../components/DeleteEmployee";
 
 type Employee = {
   name: string;
@@ -21,6 +25,8 @@ type Employee = {
 
 export default function EmployeeList() {
   const [employees, setEmployees] = useState<Employee[]>([]);
+  const [editEmployee, setEditEmployee] = useState<Employee | null>(null);
+  const [deleteEmployee, setDeleteEmployee] = useState<Employee | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
 
   useEffect(() => {
@@ -35,6 +41,10 @@ export default function EmployeeList() {
     setModalOpen(false);
     const updatedEmployees = await fetchEmployee();
     setEmployees(updatedEmployees);
+  };
+    const refreshEmployees = async () => {
+    const data = await fetchEmployee();
+    setEmployees(data);
   };
 
   return (
@@ -73,11 +83,15 @@ export default function EmployeeList() {
               <TableCell>{employee.name}</TableCell>
               <TableCell>{employee.email}</TableCell>
               <TableCell>
-                <Button
-                  onClick={() => alert(`Viewing details for ${employee.name}`)}
+                <IconButton onClick={() => setEditEmployee(employee)}>
+                  <EditIcon />
+                </IconButton>
+                <IconButton
+                  color="error"
+                  onClick={() => setDeleteEmployee(employee)}
                 >
-                  View
-                </Button>
+                  <DeleteIcon />
+                </IconButton>
               </TableCell>
             </TableRow>
           ))}
@@ -85,6 +99,35 @@ export default function EmployeeList() {
       </Table>
       <CustomModal open={modalOpen} onClose={() => setModalOpen(false)}>
         <AddEmployee onSave={handleSave} />
+      </CustomModal>
+      <CustomModal
+        open={!!editEmployee}
+        onClose={() => setEditEmployee(null)}
+      >
+        {editEmployee && (
+          <EditEmployee
+            employee={editEmployee}
+            onSave={async () => {
+              setEditEmployee(null);
+              await refreshEmployees();
+            }}
+          />
+        )}
+      </CustomModal>
+      <CustomModal
+        open={!!deleteEmployee}
+        onClose={() => setDeleteEmployee(null)}
+      >
+        {deleteEmployee && (
+          <DeleteEmployee
+            employee={deleteEmployee}
+            onDeleted={async () => {
+              setDeleteEmployee(null);
+              await refreshEmployees();
+            }}
+            onCancel={() => setDeleteEmployee(null)}
+          />
+        )}
       </CustomModal>
     </Box>
   );
