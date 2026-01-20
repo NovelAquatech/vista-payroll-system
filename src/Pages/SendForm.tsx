@@ -11,11 +11,16 @@ import {
   Chip,
 } from "@mui/material";
 import dayjs from "dayjs";
-import { fetchEmployeeEmails, sendPayslips } from "../lib/api";
+import { fetchEmployee, sendPayslips } from "../lib/api";
+
+type Employee = {
+  name: string;
+  email: string;
+};
 
 export default function SendPayslips() {
-  const [emails, setEmails] = useState<string[]>([]);
-  const [selectedEmails, setSelectedEmails] = useState<string[]>([]);
+  const [employees, setEmployees] = useState<Employee[]>([]);
+  const [selectedEmployees, setSelectedEmployees] = useState<String[]>([]);
   const [file, setFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
   const months = Array.from({ length: 12 }, (_, i) =>
@@ -27,11 +32,11 @@ export default function SendPayslips() {
     `${months[new Date().getMonth()]} ${currentYear}`
   );
   useEffect(() => {
-    fetchEmployeeEmails()
-      .then(setEmails)
+    fetchEmployee()
+      .then(setEmployees)
       .catch((err) => alert(err.message));
   }, []);
-  // console.log(emails)
+
   const fileToBase64 = (file: File): Promise<string> =>
     new Promise((resolve, reject) => {
       const reader = new FileReader();
@@ -44,8 +49,8 @@ export default function SendPayslips() {
       reader.readAsDataURL(file);
     });
 
-  const handleSubmit = async () => {
-    if (!file || selectedEmails.length === 0) {
+    const handleSubmit = async () => {
+    if (!file || selectedEmployees.length === 0) {
       alert("Please select employees and upload a PDF");
       return;
     }
@@ -55,24 +60,30 @@ export default function SendPayslips() {
     try {
       const base64 = await fileToBase64(file);
 
-      const payslips = selectedEmails.map((email) => ({
-        email,
+      const selectedEmployeeObjects = employees.filter((emp) =>
+        selectedEmployees.includes(emp.email)
+      );
+
+      const payslips = selectedEmployeeObjects.map((emp) => ({
+        name: emp.name,
+        email: emp.email,
         filename: file.name,
         fileBase64: base64,
       }));
 
       await sendPayslips({
+        payrollMonth,
         subject: `${payrollMonth} Payslip`,
         message: `
-          <p>Dear Employee,</p>
-          <p>Please find attached your <strong>${payrollMonth} payslip</strong>.</p>
-          <p>Have a nice day.<br/><strong>VistaCloud Team</strong></p>
-        `,
+        <p>Dear Employee,</p>
+        <p>Please find attached your <strong>${payrollMonth} payslip</strong>.</p>
+        <p>Have a nice day.<br/><strong>VistaCloud Team</strong></p>
+      `,
         payslips,
       });
 
       alert("Payslips sent successfully");
-      setSelectedEmails([]);
+      setSelectedEmployees([]);
       setFile(null);
     } catch (err: any) {
       alert(err.message);
@@ -107,24 +118,39 @@ export default function SendPayslips() {
           ))}
         </Select>
       </FormControl>
-      <FormControl>
+      <FormControl fullWidth>
         <InputLabel>Select Employees</InputLabel>
         <Select
           multiple
-          value={selectedEmails}
-          onChange={(e) => setSelectedEmails(e.target.value as string[])}
+          value={selectedEmployees}
+          onChange={(e) => setSelectedEmployees(e.target.value as string[])}
           input={<OutlinedInput label="Select Employees" />}
           renderValue={(selected) => (
             <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
-              {(selected as string[]).map((value) => (
-                <Chip key={value} label={value} />
-              ))}
+              {(selected as string[]).map((email) => {
+                const emp = employees.find((e) => e.email === email);
+                return (
+                  <Chip
+                    key={email}
+                    label={`${emp?.name} (${email})`}
+                    onDelete={(e) => {
+                      e.stopPropagation();
+                      setSelectedEmployees((prev) =>
+                        prev.filter((item) => item !== email)
+                      );
+                    }}
+                    onMouseDown={(e) => {
+                      e.stopPropagation();
+                    }}
+                  />
+                );
+              })}
             </Box>
           )}
         >
-          {emails.map((email) => (
-            <MenuItem key={email} value={email}>
-              {email}
+          {employees.map((emp) => (
+            <MenuItem key={emp.email} value={emp.email}>
+              {emp.name} ({emp.email})
             </MenuItem>
           ))}
         </Select>
