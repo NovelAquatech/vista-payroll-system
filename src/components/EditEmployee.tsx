@@ -31,7 +31,7 @@ export default function EditEmployee({ employee, onSave }: EditEmployeeProps) {
     setLoading(true);
     try {
       await updateEmployee({
-        originalEmail: employee.email,
+        // originalEmail: employee.email,
         name,
         email
       });
