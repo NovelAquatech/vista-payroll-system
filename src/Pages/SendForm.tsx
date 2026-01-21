@@ -16,6 +16,7 @@ import { fetchEmployee, sendPayslips } from "../lib/api";
 type Employee = {
   name: string;
   email: string;
+  id: string;
 };
 
 export default function SendPayslips() {
@@ -26,7 +27,7 @@ export default function SendPayslips() {
   const months = Array.from({ length: 12 }, (_, i) =>
     dayjs().month(i).format("MMMM")
   );
-
+// console.log(employees)
   const currentYear = new Date().getFullYear();
   const [payrollMonth, setPayrollMonth] = useState(
     `${months[new Date().getMonth()]} ${currentYear}`
@@ -65,6 +66,7 @@ export default function SendPayslips() {
       );
 
       const payslips = selectedEmployeeObjects.map((emp) => ({
+        id: emp.id,
         name: emp.name,
         email: emp.email,
         filename: file.name,

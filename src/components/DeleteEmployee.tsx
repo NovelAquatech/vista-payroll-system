@@ -6,6 +6,7 @@ import {
 import { deleteEmployee } from "../lib/api";
 
 type Employee = {
+  id: string;
   name: string;
   email: string;
 };
@@ -23,7 +24,7 @@ export default function DeleteEmployee({
 }: DeleteEmployeeProps) {
   const handleDelete = async () => {
     try {
-      await deleteEmployee(employee.email);
+      await deleteEmployee(employee.id);
       onDeleted();
     } catch (err: any) {
       alert(err.message);

@@ -10,6 +10,7 @@ import { updateEmployee } from "../lib/api";
 type Employee = {
   name: string;
   email: string;
+  id: string;
 };
 
 interface EditEmployeeProps {
@@ -31,7 +32,7 @@ export default function EditEmployee({ employee, onSave }: EditEmployeeProps) {
     setLoading(true);
     try {
       await updateEmployee({
-        originalEmail: employee.email,
+        id: employee.id,
         name,
         email
       });
