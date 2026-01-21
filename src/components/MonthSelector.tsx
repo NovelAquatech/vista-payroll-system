@@ -1,7 +1,12 @@
 import dayjs from "dayjs";
 import { Select, MenuItem } from "@mui/material";
 
-export function MonthSelector({ value, onChange }) {
+interface MonthSelectorProps {
+  value: string;
+  onChange: (value: string) => void;
+}
+
+export function MonthSelector({ value, onChange }: MonthSelectorProps) {
   const months = Array.from({ length: 12 }, (_, i) =>
     dayjs().month(i).format("MMMM")
   );
