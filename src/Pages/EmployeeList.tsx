@@ -35,7 +35,7 @@ export default function EmployeeList() {
 
   useEffect(() => {
     fetchEmployee()
-      .then(setEmployees)
+      .then((data) => setEmployees(data as Employee[]))
       .catch((err) => alert(err.message));
   }, []);
   const handleAddEmployee = () => {
@@ -44,11 +44,11 @@ export default function EmployeeList() {
   const handleSave = async () => {
     setModalOpen(false);
     const updatedEmployees = await fetchEmployee();
-    setEmployees(updatedEmployees);
+    setEmployees(updatedEmployees as Employee[]);
   };
     const refreshEmployees = async () => {
     const data = await fetchEmployee();
-    setEmployees(data);
+    setEmployees(data as Employee[]);
   };
 
   // console.log("Employees:", employees);
