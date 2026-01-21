@@ -1,4 +1,5 @@
 export type Employee = {
+  id: string;
   name: string;
   email: string;
 };
@@ -36,7 +37,7 @@ export async function fetchPayslipStatus(month: string) {
   if (!res.ok) throw new Error("Failed to fetch payslip status");
   return res.json();
 }
-export async function updateEmployee(payload: { name: string; email: string }) {
+export async function updateEmployee(payload: { id:string,name: string; email: string }) {
   const res = await fetch(`${import.meta.env.VITE_EDIT_EMPLOYEE_URL}`, {
     method: "PUT",
     headers: { "Content-Type": "application/json" },
@@ -46,10 +47,10 @@ export async function updateEmployee(payload: { name: string; email: string }) {
   if (!res.ok) throw new Error("Failed to update employee");
 }
 
-export async function deleteEmployee(email: string) {
+export async function deleteEmployee(id: string) {
   const url =
     `${import.meta.env.VITE_API_BASE_URL}/deleteEmployee` +
-    `?email=${encodeURIComponent(email)}` +
+    `?id=${id}` +
     `&code=${import.meta.env.VITE_FUNCTION_KEY}`;
   const res = await fetch(url, {
     method: "POST",

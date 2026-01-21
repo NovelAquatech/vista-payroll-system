@@ -19,8 +19,12 @@ import EditEmployee from "../components/EditEmployee";
 import DeleteEmployee from "../components/DeleteEmployee";
 
 type Employee = {
+  id: string;
   name: string;
   email: string;
+  address: string;
+  dob: string;
+  salary:string;
 };
 
 export default function EmployeeList() {
@@ -47,6 +51,8 @@ export default function EmployeeList() {
     setEmployees(data);
   };
 
+  // console.log("Employees:", employees);
+
   return (
     <Box sx={{ maxWidth: 900, mx: "auto", mt: 5 }}>
       <Box
@@ -65,8 +71,11 @@ export default function EmployeeList() {
       <Table>
         <TableHead>
           <TableRow>
-            <TableCell>Employee</TableCell>
+            <TableCell>Name</TableCell>
+            <TableCell>Address</TableCell>
+            <TableCell>DOB</TableCell>            
             <TableCell>Email</TableCell>
+            <TableCell>Salary</TableCell>
             <TableCell>Action</TableCell>
           </TableRow>
         </TableHead>
@@ -74,14 +83,17 @@ export default function EmployeeList() {
         <TableBody>
           {employees.map((employee) => (
             <TableRow
-              key={employee.email}
+              key={employee.id}
               sx={{
                 "&:hover": { backgroundColor: "#f5f5f5" },
                 alignItems: "center",
               }}
             >
               <TableCell>{employee.name}</TableCell>
+              <TableCell>{employee.address}</TableCell>
+              <TableCell>{employee.dob}</TableCell>
               <TableCell>{employee.email}</TableCell>
+              <TableCell>{employee.salary}</TableCell>
               <TableCell>
                 <IconButton onClick={() => setEditEmployee(employee)}>
                   <EditIcon />
