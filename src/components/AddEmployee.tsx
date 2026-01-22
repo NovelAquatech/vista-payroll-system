@@ -1,5 +1,6 @@
 import { Box, Button, TextField } from "@mui/material";
 import { useState } from "react";
+import authFetch from "../lib/auth";
 interface AddEmployeeProps {
   onSave: () => void;
 }
@@ -12,7 +13,7 @@ export default function AddEmployee({ onSave }: AddEmployeeProps) {
   const[salary, setSalary] = useState("");
 
   const handleSave = async () => {
-    await fetch(import.meta.env.VITE_ADD_EMPLOYEE_URL, {
+    await authFetch(import.meta.env.VITE_ADD_EMPLOYEE_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ name, email, address, dob, salary }),
