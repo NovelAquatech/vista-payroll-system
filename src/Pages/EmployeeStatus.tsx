@@ -14,6 +14,7 @@ import {
   Pagination,
 } from "@mui/material";
 import CheckIcon from "@mui/icons-material/Check";
+import CircularProgress from "@mui/material/CircularProgress";
 import dayjs from "dayjs";
 import { fetchPayslipStatus } from "../lib/api";
 
@@ -29,12 +30,15 @@ type StatusRow = {
 export default function EmployeeStatus() {
   const [rows, setRows] = useState<StatusRow[]>([]);
   const [month, setMonth] = useState(dayjs().format("YYYY-MM"));
+  const [loading, setLoading] = useState(false);
   const months = Array.from({ length: 12 }, (_, i) =>
     dayjs().month(i).format("YYYY-MM"),
   );
 
   useEffect(() => {
+    setLoading(true);
     fetchPayslipStatus(month).then(setRows);
+    setLoading(false);
   }, [month]);
 
   return (
@@ -66,6 +70,7 @@ export default function EmployeeStatus() {
           </Select>
         </FormControl>
       </Box>
+
       <Table sx={{ minWidth: 650 }} aria-label="employee status table">
         <TableHead>
           <TableRow>
@@ -76,25 +81,29 @@ export default function EmployeeStatus() {
             <TableCell>Sent At</TableCell>
           </TableRow>
         </TableHead>
-
-        <TableBody>
-          {rows.map((row) => (
-            <TableRow key={row.email}>
-              <TableCell>{row.name}</TableCell>
-              <TableCell>{row.month}</TableCell>
-              <TableCell>{row.fileName || "-"}</TableCell>
-              <TableCell>
-                {row.sent ? <CheckIcon color="success" /> : ""}
-              </TableCell>
-              <TableCell>
-                {row.sentAt
-                  ? dayjs(row.sentAt).format("DD-MMM-YYYY HH:mm")
-                  : "-"}
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
+        {loading ? (
+          <CircularProgress />
+        ) : (
+          <TableBody>
+            {rows.map((row) => (
+              <TableRow key={row.email}>
+                <TableCell>{row.name}</TableCell>
+                <TableCell>{row.month}</TableCell>
+                <TableCell>{row.fileName || "-"}</TableCell>
+                <TableCell>
+                  {row.sent ? <CheckIcon color="success" /> : ""}
+                </TableCell>
+                <TableCell>
+                  {row.sentAt
+                    ? dayjs(row.sentAt).format("DD-MMM-YYYY HH:mm")
+                    : "-"}
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        )}
       </Table>
+
       <Pagination
         count={12}
         page={dayjs(month).month() + 1}

@@ -12,6 +12,7 @@ import {
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import IconButton from "@mui/material/IconButton";
+import CircularProgress from "@mui/material/CircularProgress";
 import { fetchEmployee } from "../lib/api";
 import CustomModal from "../components/CustomModal";
 import AddEmployee from "../components/AddEmployee";
@@ -24,19 +25,22 @@ type Employee = {
   email: string;
   address: string;
   dob: string;
-  salary:string;
+  salary: string;
 };
 
 export default function EmployeeList() {
+  const [loading, setLoading] = useState(false);
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [editEmployee, setEditEmployee] = useState<Employee | null>(null);
   const [deleteEmployee, setDeleteEmployee] = useState<Employee | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
 
   useEffect(() => {
+    setLoading(true);
     fetchEmployee()
       .then((data) => setEmployees(data as Employee[]))
-      .catch((err) => alert(err.message));
+      .catch((err) => alert(err.message))
+      .finally(() => setLoading(false));
   }, []);
   const handleAddEmployee = () => {
     setModalOpen(true);
@@ -46,7 +50,7 @@ export default function EmployeeList() {
     const updatedEmployees = await fetchEmployee();
     setEmployees(updatedEmployees as Employee[]);
   };
-    const refreshEmployees = async () => {
+  const refreshEmployees = async () => {
     const data = await fetchEmployee();
     setEmployees(data as Employee[]);
   };
@@ -68,54 +72,56 @@ export default function EmployeeList() {
           + Add Employee
         </Button>
       </Box>
+
       <Table>
         <TableHead>
           <TableRow>
             <TableCell>Name</TableCell>
             <TableCell>Address</TableCell>
-            <TableCell>DOB</TableCell>            
+            <TableCell>DOB</TableCell>
             <TableCell>Email</TableCell>
             <TableCell>Salary</TableCell>
             <TableCell>Action</TableCell>
           </TableRow>
         </TableHead>
-
-        <TableBody>
-          {employees.map((employee) => (
-            <TableRow
-              key={employee.id}
-              sx={{
-                "&:hover": { backgroundColor: "#f5f5f5" },
-                alignItems: "center",
-              }}
-            >
-              <TableCell>{employee.name}</TableCell>
-              <TableCell>{employee.address}</TableCell>
-              <TableCell>{employee.dob}</TableCell>
-              <TableCell>{employee.email}</TableCell>
-              <TableCell>{employee.salary}</TableCell>
-              <TableCell>
-                <IconButton onClick={() => setEditEmployee(employee)}>
-                  <EditIcon />
-                </IconButton>
-                <IconButton
-                  color="error"
-                  onClick={() => setDeleteEmployee(employee)}
-                >
-                  <DeleteIcon />
-                </IconButton>
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
+        {loading ? (
+          <CircularProgress />
+        ) : (
+          <TableBody>
+            {employees.map((employee) => (
+              <TableRow
+                key={employee.id}
+                sx={{
+                  "&:hover": { backgroundColor: "#f5f5f5" },
+                  alignItems: "center",
+                }}
+              >
+                <TableCell>{employee.name}</TableCell>
+                <TableCell>{employee.address}</TableCell>
+                <TableCell>{employee.dob}</TableCell>
+                <TableCell>{employee.email}</TableCell>
+                <TableCell>{employee.salary}</TableCell>
+                <TableCell>
+                  <IconButton onClick={() => setEditEmployee(employee)}>
+                    <EditIcon />
+                  </IconButton>
+                  <IconButton
+                    color="error"
+                    onClick={() => setDeleteEmployee(employee)}
+                  >
+                    <DeleteIcon />
+                  </IconButton>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        )}
       </Table>
+
       <CustomModal open={modalOpen} onClose={() => setModalOpen(false)}>
         <AddEmployee onSave={handleSave} />
       </CustomModal>
-      <CustomModal
-        open={!!editEmployee}
-        onClose={() => setEditEmployee(null)}
-      >
+      <CustomModal open={!!editEmployee} onClose={() => setEditEmployee(null)}>
         {editEmployee && (
           <EditEmployee
             employee={editEmployee}
