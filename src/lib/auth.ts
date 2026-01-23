@@ -1,4 +1,4 @@
-function getAuthHeaders(): HeadersInit {
+export function getAuthHeaders(): HeadersInit {
   const token = localStorage.getItem("authToken");
 
   if (!token) {
@@ -10,15 +10,21 @@ function getAuthHeaders(): HeadersInit {
     Authorization: `Bearer ${token}`,
   };
 }
-
 export default async function authFetch(
   input: RequestInfo,
   init: RequestInit = {}
 ) {
+    const token = localStorage.getItem("authToken");
+
+  if (!token) {
+    window.location.href = import.meta.env.VITE_LOGIN_URL;
+    return Promise.reject("Not authenticated");
+  }
   const headers = {
     ...getAuthHeaders(),
     ...(init.headers || {}),
   };
+  
 
   const response = await fetch(input, {
     ...init,
@@ -28,7 +34,7 @@ export default async function authFetch(
   if (response.status === 401) {
     // optional: redirect back to Website A
     localStorage.removeItem("authToken");
-    window.location.href = import.meta.env.VITE_LOGIN_URL;
+    window.location.href = import.meta.env.VITE_VISTA_URL;
   }
 
   return response;
