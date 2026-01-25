@@ -38,7 +38,7 @@ export async function fetchPayslipStatus(month: string) {
   if (!res.ok) throw new Error("Failed to fetch payslip status");
   return res.json();
 }
-export async function updateEmployee(payload: { id:string,name: string; email: string }) {
+export async function updateEmployee(payload: { id:string,name: string; email: string, address:string,dob:string, salary:string}) {
   const res = await authFetch(`${import.meta.env.VITE_EDIT_EMPLOYEE_URL}`, {
     method: "PUT",
     headers: { "Content-Type": "application/json" },
