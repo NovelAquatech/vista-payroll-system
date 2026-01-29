@@ -3,10 +3,13 @@ import { Link, useLocation } from "react-router-dom";
 
 export default function Navbar() {
   const location = useLocation();
-
+  const handleLogout = () => {    
+    localStorage.removeItem("authToken");    
+    window.location.href = "https://vistacloud.in";
+  };
   const navItems = [
     { label: "Dashboard", path: "/" },
-    { label: "Employees", path: "/employees" },    
+    { label: "Employees", path: "/employees" },
     { label: "Send Payslips", path: "/send-payslips" },
   ];
 
@@ -32,6 +35,9 @@ export default function Navbar() {
               {item.label}
             </Button>
           ))}
+          <Button color="inherit" onClick={handleLogout} sx={{ ml: 1 }}>
+            Logout
+          </Button>
         </Box>
       </Toolbar>
     </AppBar>
