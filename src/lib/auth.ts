@@ -1,8 +1,10 @@
-export function getAuthHeaders(): HeadersInit {
+import type { JSX } from "@emotion/react/jsx-dev-runtime";
+
+export function getAuthHeaders(): HeadersInit | null {
   const token = localStorage.getItem("authToken");
 
   if (!token) {
-    throw new Error("Missing auth token");
+    return null;
   }
 
   return {
@@ -12,30 +14,41 @@ export function getAuthHeaders(): HeadersInit {
 }
 export default async function authFetch(
   input: RequestInfo,
-  init: RequestInit = {}
+  init: RequestInit = {},
 ) {
-    const token = localStorage.getItem("authToken");
+  const headersFromAuth = getAuthHeaders();
 
-  if (!token) {
+  if (!headersFromAuth) {
+    localStorage.removeItem("authToken");
     window.location.href = import.meta.env.VITE_LOGIN_URL;
-    return Promise.reject("Not authenticated");
+    throw new Error("Not authenticated");
   }
-  const headers = {
-    ...getAuthHeaders(),
-    ...(init.headers || {}),
-  };
-  
 
   const response = await fetch(input, {
     ...init,
-    headers,
+    headers: {
+      ...headersFromAuth,
+      ...(init.headers || {}),
+    },
   });
 
   if (response.status === 401) {
     // optional: redirect back to Website A
     localStorage.removeItem("authToken");
     window.location.href = import.meta.env.VITE_VISTA_URL;
+    throw new Error("Session expired");
   }
 
   return response;
+}
+
+export function ProtectedRoute({ children }: { children: JSX.Element }) {
+  const token = localStorage.getItem("authToken");
+
+  if (!token) {
+    window.location.replace(import.meta.env.VITE_LOGIN_URL);
+    return null;
+  }
+
+  return children;
 }
