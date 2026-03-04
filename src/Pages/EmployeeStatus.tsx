@@ -12,12 +12,13 @@ import {
   Select,
   MenuItem,
   Pagination,
-  IconButton,
+  IconButton,Button,
 } from "@mui/material";
 import CheckIcon from "@mui/icons-material/Check";
+import FileDownloadIcon from '@mui/icons-material/FileDownload';
 import CircularProgress from "@mui/material/CircularProgress";
 import dayjs from "dayjs";
-import { fetchPayslipStatus } from "../lib/api";
+import { fetchPayslipStatus, getFileUrl } from "../lib/api";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 
 type StatusRow = {
@@ -46,6 +47,11 @@ export default function EmployeeStatus() {
     // Optional: clear auth token when leaving Website B
     localStorage.removeItem("authToken");
     window.location.href = import.meta.env.VITE_VISTA_URL;
+  };
+
+  const handleDownload = async (fileName: string) => {
+    const res = await getFileUrl(fileName);
+    window.open(res.url, "_blank");
   };
   return (
     <>
@@ -113,7 +119,12 @@ export default function EmployeeStatus() {
                 <TableRow key={row.email}>
                   <TableCell>{row.name}</TableCell>
                   <TableCell>{row.month}</TableCell>
-                  <TableCell>{row.fileName || "-"}</TableCell>
+                  <TableCell>
+                    {row.fileName || "-"}
+                    <Button variant="contained" onClick={() => handleDownload(row.fileName)}>
+                      <FileDownloadIcon />
+                    </Button>
+                  </TableCell>
                   <TableCell>
                     {row.sent ? <CheckIcon color="success" /> : ""}
                   </TableCell>
