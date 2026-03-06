@@ -52,9 +52,10 @@ export default function EmployeeStatus() {
 
   const handleDownload = async (fileName: string) => {
     const res = await getFileUrl(fileName);
+    console.log("Download URL:", res.url);
     const link = document.createElement("a");
     link.href = res.url;
-    link.setAttribute("download", fileName); // Forces download
+    link.setAttribute("download", fileName); 
     document.body.appendChild(link);
     link.click();
     link.remove();
