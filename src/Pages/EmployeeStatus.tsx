@@ -12,10 +12,11 @@ import {
   Select,
   MenuItem,
   Pagination,
-  IconButton,Button,
+  IconButton,
+  Button,
 } from "@mui/material";
 import CheckIcon from "@mui/icons-material/Check";
-import FileDownloadIcon from '@mui/icons-material/FileDownload';
+import FileDownloadIcon from "@mui/icons-material/FileDownload";
 import CircularProgress from "@mui/material/CircularProgress";
 import dayjs from "dayjs";
 import { fetchPayslipStatus, getFileUrl } from "../lib/api";
@@ -51,8 +52,14 @@ export default function EmployeeStatus() {
 
   const handleDownload = async (fileName: string) => {
     const res = await getFileUrl(fileName);
-    window.open(res.url, "_blank");
+    const link = document.createElement("a");
+    link.href = res.url;
+    link.setAttribute("download", fileName); // Forces download
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
   };
+
   return (
     <>
       <Box
@@ -120,10 +127,24 @@ export default function EmployeeStatus() {
                   <TableCell>{row.name}</TableCell>
                   <TableCell>{row.month}</TableCell>
                   <TableCell>
-                    {row.fileName || "-"}
-                    <Button variant="contained" onClick={() => handleDownload(row.fileName)}>
-                      <FileDownloadIcon />
-                    </Button>
+                    <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                      {row.fileName || "-"}
+                      {row.fileName && (
+                        <Button
+                          variant="contained"
+                          size="small"
+                          startIcon={<FileDownloadIcon />}
+                          onClick={() => handleDownload(row.fileName)}
+                          sx={{
+                            textTransform: "none", // Keeps text from being all caps
+                            borderRadius: 1, // Matches the slightly rounded look
+                          }}
+                        >
+                          {/* You can leave this empty for just an icon button like the image, 
+            or add text like "Download" */}
+                        </Button>
+                      )}
+                    </Box>
                   </TableCell>
                   <TableCell>
                     {row.sent ? <CheckIcon color="success" /> : ""}
