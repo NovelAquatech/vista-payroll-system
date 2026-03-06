@@ -50,32 +50,39 @@ export default function EmployeeStatus() {
     window.location.href = import.meta.env.VITE_VISTA_URL;
   };
 
-const handleDownload = async (fileName: string) => {
-  console.log("Initiating download for:", fileName);
-  try {
-    const res = await getFileUrl(fileName);
-    
-    // Fetch the file as a blob to stay within the React context
-    const response = await fetch(res.url);
-    if (!response.ok) throw new Error("Network response was not ok");
-    
-    const blob = await response.blob();
-    const blobUrl = window.URL.createObjectURL(blob);
+  const handleDownload = async (fileName: string) => {
+    console.log("Initiating download for:", fileName);
+    try {
+      // 1. Get the SAS URL using your authenticated wrapper
+      const resData = await getFileUrl(fileName);
+      const sasUrl = resData.url;
 
-    const link = document.createElement("a");
-    link.href = blobUrl;
-    link.download = fileName; // Force download filename
-    document.body.appendChild(link);
-    link.click();
+      // 2. Fetch the file using the SAS URL
+      const response = await window.fetch(sasUrl);
 
-    // Clean up
-    link.remove();
-    window.URL.revokeObjectURL(blobUrl);
-    console.log("Initiating download for:", blobUrl);
-  } catch (error) {
-    console.error("Download failed:", error);
-  }
-};
+      if (!response.ok) {
+        console.error("Blob download failed", response.status);
+        return;
+      }
+
+      // 3. Convert to blob and download locally
+      const blob = await response.blob();
+      const blobUrl = window.URL.createObjectURL(blob);
+
+      const link = document.createElement("a");
+      link.href = blobUrl;
+      link.download = fileName;
+      document.body.appendChild(link);
+      link.click();
+
+      // 4. Clean up
+      link.remove();
+      window.URL.revokeObjectURL(blobUrl);
+      console.log("Download initiated for:", blobUrl);
+    } catch (error) {
+      console.error("Download process interrupted:", error);
+    }
+  };
 
   return (
     <>
@@ -148,13 +155,20 @@ const handleDownload = async (fileName: string) => {
                       {row.fileName || "-"}
                       {row.fileName && (
                         <Button
+                          type="button"
                           variant="outlined"
                           size="small"
                           startIcon={<FileDownloadIcon />}
-                          onClick={() => handleDownload(row.fileName)}
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            handleDownload(row.fileName);
+                          }}
                           sx={{
                             textTransform: "none", // Keeps text from being all caps
-                            borderRadius: 50, 
+                            borderRadius: "50%", // Makes the button circular
+                            minWidth: "32px", // Ensures the button is a circle even without text
+                            padding: "6px", // Adjusts padding for better icon fit
                           }}
                         >
                           {/* You can leave this empty for just an icon button like the image, 
