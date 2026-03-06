@@ -64,6 +64,7 @@ export async function deleteEmployee(id: string) {
 export async function getFileUrl(fileName: string) {
   const url = `${import.meta.env.VITE_GET_PAYSLIP_DOWNLOAD_URL}?fileName=${encodeURIComponent(fileName)}`;
   const res = await authFetch(url);
+  console.log("API Response:", res);
   if (!res.ok) throw new Error("Failed to get file URL");
   return res.json();
 }

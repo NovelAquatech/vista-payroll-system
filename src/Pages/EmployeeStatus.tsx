@@ -50,16 +50,32 @@ export default function EmployeeStatus() {
     window.location.href = import.meta.env.VITE_VISTA_URL;
   };
 
-  const handleDownload = async (fileName: string) => {
+const handleDownload = async (fileName: string) => {
+  console.log("Initiating download for:", fileName);
+  try {
     const res = await getFileUrl(fileName);
-    console.log("Download URL:", res.url);
+    
+    // Fetch the file as a blob to stay within the React context
+    const response = await fetch(res.url);
+    if (!response.ok) throw new Error("Network response was not ok");
+    
+    const blob = await response.blob();
+    const blobUrl = window.URL.createObjectURL(blob);
+
     const link = document.createElement("a");
-    link.href = res.url;
-    link.setAttribute("download", fileName); 
+    link.href = blobUrl;
+    link.download = fileName; // Force download filename
     document.body.appendChild(link);
     link.click();
+
+    // Clean up
     link.remove();
-  };
+    window.URL.revokeObjectURL(blobUrl);
+    console.log("Initiating download for:", blobUrl);
+  } catch (error) {
+    console.error("Download failed:", error);
+  }
+};
 
   return (
     <>
@@ -132,13 +148,13 @@ export default function EmployeeStatus() {
                       {row.fileName || "-"}
                       {row.fileName && (
                         <Button
-                          variant="contained"
+                          variant="outlined"
                           size="small"
                           startIcon={<FileDownloadIcon />}
                           onClick={() => handleDownload(row.fileName)}
                           sx={{
                             textTransform: "none", // Keeps text from being all caps
-                            borderRadius: 1, // Matches the slightly rounded look
+                            borderRadius: 50, 
                           }}
                         >
                           {/* You can leave this empty for just an icon button like the image, 
