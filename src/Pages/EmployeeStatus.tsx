@@ -39,11 +39,24 @@ export default function EmployeeStatus() {
     dayjs().month(i).format("YYYY-MM"),
   );
 
-  useEffect(() => {
-    setLoading(true);
-    fetchPayslipStatus(month).then(setRows);
-    setLoading(false);
-  }, [month]);
+useEffect(() => {
+  const loadData = async () => {
+    try {
+      setLoading(true);
+
+      const data = await fetchPayslipStatus(month);
+
+      setRows(data);
+    } catch (err) {
+      console.error("Failed to fetch payslip status", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  loadData();
+}, [month]);
+  
   const handleBack = () => {
     // Optional: clear auth token when leaving Website B
     localStorage.removeItem("authToken");
@@ -143,7 +156,10 @@ export default function EmployeeStatus() {
             </TableRow>
           </TableHead>
           {loading ? (
-            <CircularProgress sx={{ display: "block", mx: "auto" }} />
+            <Box sx={{ textAlign: "center", mt: 5 }}>
+              <CircularProgress sx={{ display: "block", mx: "auto" }} />
+            </Box>
+            
           ) : (
             <TableBody>
               {rows.map((row) => (

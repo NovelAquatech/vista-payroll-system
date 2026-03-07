@@ -85,7 +85,10 @@ export default function EmployeeList() {
           </TableRow>
         </TableHead>
         {loading ? (
-          <CircularProgress sx={{ display: "block", mx: "auto" }} />
+          <Box sx={{ textAlign: "center", mt: 5 }}>
+            <CircularProgress sx={{ display: "block", mx: "auto" }} />
+          </Box>
+          
         ) : (
           <TableBody>
             {employees.map((employee) => (
