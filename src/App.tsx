@@ -1,5 +1,5 @@
 import { Routes, Route } from "react-router-dom";
-import { useEffect, useState } from "react";
+// import { useEffect, useState } from "react";
 // import { ProtectedRoute } from "./lib/auth";
 import Navbar from "./components/Navbar";
 import EmployeeList from "./Pages/EmployeeList";
