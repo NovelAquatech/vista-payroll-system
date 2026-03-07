@@ -62,8 +62,7 @@ export default async function authFetch(
   });
 
   if (response.status === 401) {
-    localStorage.removeItem("authToken");
-    window.location.href = import.meta.env.VITE_LOGIN_URL;
+    localStorage.removeItem("authToken");    
     throw new Error("Session expired");
   }
 

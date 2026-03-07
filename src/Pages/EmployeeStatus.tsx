@@ -64,38 +64,28 @@ useEffect(() => {
   };
 
   const handleDownload = async (fileName: string) => {
-    console.log("Initiating download for:", fileName);
-    try {
-      // 1. Get the SAS URL using your authenticated wrapper
-      const resData = await getFileUrl(fileName);
-      const sasUrl = resData.url;
+  console.log("Initiating download for:", fileName);
 
-      // 2. Fetch the file using the SAS URL
-      const response = await window.fetch(sasUrl);
+  try {
+    const resData = await getFileUrl(fileName);
 
-      if (!response.ok) {
-        console.error("Blob download failed", response.status);
-        return;
-      }
-
-      // 3. Convert to blob and download locally
-      const blob = await response.blob();
-      const blobUrl = window.URL.createObjectURL(blob);
-
-      const link = document.createElement("a");
-      link.href = blobUrl;
-      link.download = fileName;
-      document.body.appendChild(link);
-      link.click();
-
-      // 4. Clean up
-      link.remove();
-      window.URL.revokeObjectURL(blobUrl);
-      console.log("Download initiated for:", blobUrl);
-    } catch (error) {
-      console.error("Download process interrupted:", error);
+    if (!resData?.url) {
+      console.error("No download URL returned");
+      return;
     }
-  };
+
+    const link = document.createElement("a");
+    link.href = resData.url;
+    link.download = fileName;
+
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+
+  } catch (error) {
+    console.error("Download failed:", error);
+  }
+};
 
   return (
     <>
@@ -173,7 +163,7 @@ useEffect(() => {
                         <Button
                           type="button"
                           variant="outlined"
-                          size="small"
+                          size="small"                          
                           startIcon={<FileDownloadIcon />}
                           onClick={(e) => {
                             e.preventDefault();
@@ -181,10 +171,10 @@ useEffect(() => {
                             handleDownload(row.fileName);
                           }}
                           sx={{
-                            textTransform: "none", // Keeps text from being all caps
-                            borderRadius: "50%", // Makes the button circular
-                            minWidth: "32px", // Ensures the button is a circle even without text
-                            padding: "6px", // Adjusts padding for better icon fit
+                            textTransform: "none",                            
+                            minWidth: "32px",
+                            border: "none",
+                            padding: "6px",
                           }}
                         >
                           {/* You can leave this empty for just an icon button like the image, 
