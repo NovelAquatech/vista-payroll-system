@@ -63,11 +63,11 @@ useEffect(() => {
     window.location.href = import.meta.env.VITE_VISTA_URL;
   };
 
-  const handleDownload = async (fileName: string) => {
+  const handleDownload = async (fileName: string, month: string) => {
   console.log("Initiating download for:", fileName);
 
   try {
-    const resData = await getFileUrl(fileName);
+    const resData = await getFileUrl(fileName, month);
 
     if (!resData?.url) {
       console.error("No download URL returned");
@@ -168,7 +168,7 @@ useEffect(() => {
                           onClick={(e) => {
                             e.preventDefault();
                             e.stopPropagation();
-                            handleDownload(row.fileName);
+                            handleDownload(row.fileName, row.month);
                           }}
                           sx={{
                             textTransform: "none",                            
