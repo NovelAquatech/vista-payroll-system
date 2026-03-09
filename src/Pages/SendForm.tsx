@@ -15,6 +15,7 @@ import {
   TableHead,
   TableRow,
   IconButton,
+  TextField,
 } from "@mui/material";
 import UploadFileIcon from "@mui/icons-material/UploadFile";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -41,6 +42,7 @@ export default function SendPayslips() {
   const [payrollMonth, setPayrollMonth] = useState(
     `${months[new Date().getMonth()]} ${currentYear}`,
   );
+  const [message, setMessage] = useState<Record<string, string>>({});
 
   useEffect(() => {
     fetchEmployee()
@@ -81,23 +83,22 @@ export default function SendPayslips() {
       }
 
       const payslips = await Promise.all(
-        selectedEmployeeObjects.map(async (emp) => ({
-          id: emp.id,
-          name: emp.name,
-          email: emp.email,
-          filename: files[emp.id]!.name,
-          fileBase64: await fileToBase64(files[emp.id]!),
-        })),
+        selectedEmployeeObjects.map(async (emp) => {
+          return {
+            id: emp.id,
+            name: emp.name,
+            email: emp.email,
+            filename: files[emp.id]!.name,
+            fileBase64: await fileToBase64(files[emp.id]!),
+            message: message[emp.id] || "",
+          };
+        }),
       );
 
       await sendPayslips({
         payrollMonth,
         subject: `${payrollMonth} Payslip`,
-        message: `
-          <p>Dear Employee,</p>
-          <p>Please find attached your <strong>${payrollMonth} payslip</strong>.</p>
-          <p>Have a nice day.<br/><strong>VistaCloud Team</strong></p>
-        `,
+        message,
         payslips,
       });
 
@@ -166,41 +167,6 @@ export default function SendPayslips() {
         </Select>
       </FormControl>
 
-      {/* File upload per employee */}
-      {/* {employees
-        .filter((emp) => selectedEmployees.includes(emp.id))
-        .map((emp) => (
-          <Box
-            key={emp.id}
-            display="flex"
-            alignItems="center"
-            justifyContent="space-between"
-            gap={2}
-          >
-            <Typography>{emp.name}</Typography>
-
-            <Button variant="outlined" component="label">
-              Upload PDF
-              <input
-                hidden
-                type="file"
-                accept="application/pdf"
-                onChange={(e) =>
-                  setFiles((prev) => ({
-                    ...prev,
-                    [emp.id]: e.target.files?.[0] || null
-                  }))
-                }
-              />
-            </Button>
-
-            {files[emp.id] && (
-              <Typography variant="body2">
-                {files[emp.id]!.name}
-              </Typography>
-            )}
-          </Box>
-        ))} */}
       {selectedEmployees.length > 0 && (
         <Table size="small" sx={{ mt: 2 }}>
           <TableHead>
@@ -210,6 +176,9 @@ export default function SendPayslips() {
               </TableCell>
               <TableCell>
                 <strong>Email</strong>
+              </TableCell>
+              <TableCell>
+                <strong>Message</strong>
               </TableCell>
               <TableCell>
                 <strong>Attachment</strong>
@@ -227,7 +196,21 @@ export default function SendPayslips() {
                 <TableRow key={emp.id}>
                   <TableCell>{emp.name}</TableCell>
                   <TableCell>{emp.email}</TableCell>
-
+                  <TableCell sx={{ width: 300 }}>
+                    <TextField
+                      multiline
+                      size="small"
+                      rows={3}
+                      fullWidth
+                      value={message[emp.id] || ""}
+                      onChange={(e) =>
+                        setMessage((prev) => ({
+                          ...prev,
+                          [emp.id]: e.target.value,
+                        }))
+                      }
+                    />
+                  </TableCell>
                   <TableCell>
                     {files[emp.id] ? (
                       <Typography variant="body2">
