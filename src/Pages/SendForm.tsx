@@ -116,7 +116,8 @@ export default function SendPayslips() {
   return (
     <Box
       sx={{
-        maxWidth: 600,
+        maxWidth: "1000px",
+        width: "100%",
         mx: "auto",
         mt: 6,
         display: "flex",
@@ -168,6 +169,7 @@ export default function SendPayslips() {
       </FormControl>
 
       {selectedEmployees.length > 0 && (
+        <Box sx={{ width: "100%", overflowX: "auto" }}>
         <Table size="small" sx={{ mt: 2 }}>
           <TableHead>
             <TableRow>
@@ -196,11 +198,11 @@ export default function SendPayslips() {
                 <TableRow key={emp.id}>
                   <TableCell>{emp.name}</TableCell>
                   <TableCell>{emp.email}</TableCell>
-                  <TableCell sx={{ width: 300 }}>
+                  <TableCell sx={{ width: 400 }}>
                     <TextField
                       multiline
-                      size="small"
-                      rows={3}
+                      size="medium"
+                      rows={5}
                       fullWidth
                       value={message[emp.id] || ""}
                       onChange={(e) =>
@@ -257,6 +259,7 @@ export default function SendPayslips() {
               ))}
           </TableBody>
         </Table>
+        </Box>
       )}
       <Button variant="contained" onClick={handleSubmit} disabled={loading}>
         {loading ? "Sending..." : "Send Payslips"}
